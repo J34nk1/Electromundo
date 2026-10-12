@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-label="Electro Mundo">
+  <circle cx="100" cy="100" r="98" fill="#0d2b4a"/>
+  <circle cx="100" cy="100" r="72" fill="#1ea7e1"/>
+  <g fill="#ffffff">
+    <ellipse cx="100" cy="100" rx="28" ry="28" fill="none" stroke="#fff" stroke-width="5"/>
+    <ellipse cx="100" cy="100" rx="12" ry="28" fill="none" stroke="#fff" stroke-width="3.5"/>
+    <line x1="72" y1="100" x2="128" y2="100" stroke="#fff" stroke-width="3.5"/>
+    <line x1="76" y1="88" x2="124" y2="88" stroke="#fff" stroke-width="2.5"/>
+    <line x1="76" y1="112" x2="124" y2="112" stroke="#fff" stroke-width="2.5"/>
+  </g>
+  <path id="topArc" d="M 38 108 A 64 64 0 0 1 162 108" fill="none"/>
+  <path id="botArc" d="M 36 96 A 66 66 0 0 0 164 96" fill="none"/>
+  <text fill="#ffffff" font-family="Segoe UI, Arial, sans-serif" font-size="18" font-weight="700" letter-spacing="3">
+    <textPath href="#topArc" startOffset="50%" text-anchor="middle">ELECTRO</textPath>
+  </text>
+  <text fill="#ffffff" font-family="Segoe UI, Arial, sans-serif" font-size="16" font-weight="700" letter-spacing="4">
+    <textPath href="#botArc" startOffset="50%" text-anchor="middle">MUNDO</textPath>
+  </text>
+</svg>
