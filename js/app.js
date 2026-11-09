@@ -1,4 +1,5 @@
-const PRODUCTS = [
+/* Respaldo local: se usa si Supabase no está configurado o falla */
+const LOCAL_PRODUCTS = [
   {
     id: "hp-victus",
     name: "HP - Victus 15.6\" Gaming Laptop",
@@ -113,6 +114,45 @@ const PRODUCTS = [
     offer: true
   }
 ];
+
+/* ---------- Supabase ---------- */
+let PRODUCTS = LOCAL_PRODUCTS;
+const db = window.supabaseClient;
+
+async function loadProducts() {
+  if (!db) return;
+  const { data, error } = await db
+    .from("productos")
+    .select("*")
+    .order("created_at", { ascending: true });
+
+  if (error || !data?.length) {
+    console.warn("No se pudieron cargar productos de Supabase, uso los locales.", error);
+    return;
+  }
+  PRODUCTS = data.map((p) => ({
+    id: p.id,
+    name: p.name,
+    price: Number(p.price),
+    oldPrice: p.old_price ? Number(p.old_price) : undefined,
+    category: p.category,
+    image: p.image,
+    featured: p.featured,
+    offer: p.offer
+  }));
+}
+
+async function saveOrder() {
+  const items = cart
+    .map((i) => {
+      const p = PRODUCTS.find((x) => x.id === i.id);
+      return p ? { id: p.id, name: p.name, price: p.price, qty: i.qty } : null;
+    })
+    .filter(Boolean);
+  const total = items.reduce((s, i) => s + i.price * i.qty, 0);
+  const { error } = await db.from("pedidos").insert({ items, total });
+  return error;
+}
 
 const money = (n) =>
   "S/ " + n.toLocaleString("es-PE", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -311,15 +351,31 @@ function initSearch() {
 }
 
 function initContact() {
-  $("#contact-form")?.addEventListener("submit", (e) => {
+  $("#contact-form")?.addEventListener("submit", async (e) => {
     e.preventDefault();
+    const form = e.target;
     const name = $("#c-name")?.value.trim();
     const email = $("#c-email")?.value.trim();
     const msg = $("#form-msg");
     if (!name || !email || !msg) return;
-    msg.textContent = "Mensaje enviado. Te contactaremos pronto.";
+
     msg.style.color = "#86efac";
-    e.target.reset();
+    if (!db) {
+      msg.textContent = "Mensaje enviado. Te contactaremos pronto.";
+      form.reset();
+      return;
+    }
+
+    msg.textContent = "Enviando...";
+    const { error } = await db.from("mensajes_contacto").insert({ nombre: name, email });
+    if (error) {
+      console.error(error);
+      msg.style.color = "#fca5a5";
+      msg.textContent = "No se pudo enviar. Intenta nuevamente.";
+      return;
+    }
+    msg.textContent = "Mensaje enviado. Te contactaremos pronto.";
+    form.reset();
   });
 }
 
@@ -338,20 +394,34 @@ $("#cart-toggle")?.addEventListener("click", () => openCart(true));
 $("#cart-close")?.addEventListener("click", () => openCart(false));
 $(".overlay")?.addEventListener("click", () => openCart(false));
 $("#menu-toggle")?.addEventListener("click", () => $(".nav")?.classList.toggle("open"));
-$("#checkout")?.addEventListener("click", () => {
+$("#checkout")?.addEventListener("click", async () => {
   if (!cart.length) return toast("El carrito está vacío");
+  if (db) {
+    const error = await saveOrder();
+    if (error) {
+      console.error(error);
+      return toast("No se pudo registrar el pedido. Intenta de nuevo.");
+    }
+  }
   cart = [];
   saveCart();
   openCart(false);
   toast("Pedido registrado. Gracias por tu compra.");
 });
 
-initTheme();
-renderGrid("#featured-grid", PRODUCTS.filter((p) => p.featured));
-renderGrid("#offers-grid", PRODUCTS.filter((p) => p.offer));
-initCatalog();
-initHero();
-initSearch();
-initContact();
-updateBadge();
-renderCart();
+async function init() {
+  initTheme();
+  initHero();
+  initSearch();
+  initContact();
+  updateBadge();
+
+  await loadProducts();
+
+  renderGrid("#featured-grid", PRODUCTS.filter((p) => p.featured));
+  renderGrid("#offers-grid", PRODUCTS.filter((p) => p.offer));
+  initCatalog();
+  renderCart();
+}
+
+init();

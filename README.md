@@ -29,3 +29,14 @@ python -m http.server 5500
 ```
 
 Luego entra a `http://localhost:5500`.
+
+## Supabase (proyecto `electro-mundo`)
+
+1. En Supabase abre **SQL Editor → New query**, pega el contenido de `supabase/schema.sql` y presiona **Run**.
+   Crea las tablas `productos`, `mensajes_contacto` y `pedidos`, activa RLS y carga los 12 productos.
+2. En **Project Settings → API** copia el **Project URL** y la **anon public key**.
+3. Pégalos en `js/supabase-config.js` (`SUPABASE_URL` y `SUPABASE_ANON_KEY`).
+4. Abre el sitio: los productos vienen de la tabla `productos`, el formulario de contacto guarda en
+   `mensajes_contacto` y "Finalizar compra" guarda en `pedidos`.
+
+Si Supabase no está configurado, el sitio sigue funcionando con los productos locales de `js/app.js`.
