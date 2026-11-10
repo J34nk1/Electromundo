@@ -1,4 +1,3 @@
-
 document.addEventListener("DOMContentLoaded", () => {
   // Verificar la conexión con Supabase
   const supabaseClient = window.supabaseClient;
@@ -42,7 +41,21 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Cambiar entre inicio de sesión y registro
+  function clearForm() {
+    if (form) form.reset();
+    if (passwordInput) passwordInput.type = "password";
+    if (eyeButton) eyeButton.setAttribute("aria-label", "Mostrar contraseña");
+    ["req-length", "req-upper", "req-lower", "req-number"].forEach((id) => {
+      document.getElementById(id)?.classList.remove("valid");
+    });
+    const fill = document.getElementById("strength-fill");
+    if (fill) fill.style.width = "0";
+    const text = document.getElementById("strength-text");
+    if (text) text.textContent = "Contraseña débil";
+  }
+
   function setMode(newMode) {
+    if (newMode !== mode) clearForm();
     mode = newMode;
 
     if (nameField) {
@@ -187,8 +200,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
           if (data.session) {
             showMessage("¡Cuenta creada correctamente!");
+            clearForm();
             await updateInterface(data.session.user);
           } else {
+            clearForm();
             showMessage(
               "Registro enviado. Revisa tu correo para confirmar la cuenta."
             );
@@ -203,6 +218,7 @@ document.addEventListener("DOMContentLoaded", () => {
           if (error) throw error;
 
           showMessage("¡Inicio de sesión correcto!");
+          clearForm();
           await updateInterface(data.user);
         }
       } catch (error) {
