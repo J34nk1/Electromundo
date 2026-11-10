@@ -40,3 +40,11 @@ Luego entra a `http://localhost:5500`.
    `mensajes_contacto` y "Finalizar compra" guarda en `pedidos`.
 
 Si Supabase no está configurado, el sitio sigue funcionando con los productos locales de `js/app.js`.
+
+## Rediseño (estilo de cuenta.html)
+
+- `css/styles.css`: sistema de diseño único (header navy, azul #2563eb, tarjetas redondeadas, modo oscuro con variables).
+- `js/ui.js`: tema claro/oscuro y menú móvil, compartido por todas las páginas.
+- `js/app.js`: catálogo con búsqueda, orden y favoritos; carrito con totales por línea; el formulario de contacto guarda también el mensaje.
+- `js/cuenta.js`: pedidos reales en "Mis pedidos", enlace al panel solo para rol admin, y pantalla de nueva contraseña al venir del correo de recuperación.
+- No requiere cambios en Supabase (usa las tablas de `schema.sql` y `fase1.sql`).
